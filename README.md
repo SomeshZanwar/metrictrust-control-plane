@@ -2,6 +2,8 @@
 
 **Evidence-bound execution control for autonomous product-analytics agents.**
 
+[Live Demo](https://metrictrust-control-plane.onrender.com/) · [API Documentation](https://metrictrust-control-plane.onrender.com/docs) · [Health Check](https://metrictrust-control-plane.onrender.com/health)
+
 MetricTrust sits between an AI analytics agent and the systems it wants to act on
 (feature flags, experiment rollouts). It does not just check whether an agent is
 *allowed to call a tool* — it checks whether the specific action the agent is
