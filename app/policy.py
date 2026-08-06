@@ -44,7 +44,7 @@ def _get_path(context: dict, path: str) -> Any:
 def load_policies() -> list[dict]:
     rules = []
     for path in sorted(config.POLICIES_DIR.glob("*.yaml")):
-        rule = yaml.safe_load(path.read_text())
+        rule = yaml.safe_load(path.read_text(encoding="utf-8"))
         rule["_source_file"] = path.name
         rules.append(rule)
     return rules
