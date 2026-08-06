@@ -1,0 +1,20 @@
+# Agent registry: identity + bounded authority per action type.
+# Mirrors a principal/authority model — the same shape a Cedar or OPA
+# policy would consume, kept here as plain YAML for auditability without
+# an extra policy-engine dependency.
+agents:
+  - id: product-analytics-agent-01
+    display_name: "Product Analytics Agent"
+    owner: "somesh.zanwar@example.com"
+    group: ProductAnalyticsAgents
+    api_key: "demo-key-product-analytics-01"   # demo only — production uses workload identity (see ROADMAP.md)
+    authority:
+      update_experiment_rollout:
+        autonomous_max_percentage: 25
+        approval_max_percentage: 50
+        prohibited_above_percentage: 50
+      pause_experiment:
+        autonomous: false
+        approval_required: true
+      publish_metric_annotation:
+        autonomous: true

@@ -1,0 +1,7 @@
+metrictrust_evidence:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: '../metrictrust_evidence.duckdb'
+      threads: 2

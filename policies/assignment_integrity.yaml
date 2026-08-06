@@ -1,0 +1,8 @@
+id: assignment_integrity
+effect: forbid
+description: Deny experiment rollout changes when the assignment-integrity dbt test is not passing.
+action: update_experiment_rollout
+conditions:
+  - path: evidence.assignment_integrity_test
+    op: ne
+    value: PASS

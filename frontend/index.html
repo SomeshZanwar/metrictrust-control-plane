@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MetricTrust Control Plane</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #0b0e14; --panel: #131826; --panel-2: #1a2133; --border: #263049;
+    --text: #e6e9ef; --muted: #8b93a7; --accent: #4f8cff; --green: #35c98a;
+    --red: #ff5c72; --amber: #f5b942;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); }
+  header { padding: 20px 28px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: baseline; }
+  header h1 { font-size: 18px; margin: 0; letter-spacing: 0.2px; }
+  header .subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  header .badge { font-size: 11px; color: var(--muted); border: 1px solid var(--border); padding: 3px 8px; border-radius: 12px; }
+  main { padding: 24px 28px; display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; max-width: 1400px; margin: 0 auto; }
+  .full { grid-column: 1 / -1; }
+  section.card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+  section.card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); margin: 0 0 12px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; color: var(--muted); font-weight: 500; padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  td { padding: 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:hover td { background: var(--panel-2); cursor: pointer; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+  .pill.PERMIT, .pill.APPROVED, .pill.SUCCESS, .pill.EXECUTED { background: rgba(53,201,138,0.15); color: var(--green); }
+  .pill.DENY, .pill.DENIED, .pill.FAILED, .pill.REJECTED { background: rgba(255,92,114,0.15); color: var(--red); }
+  .pill.REQUIRE_APPROVAL, .pill.PENDING, .pill.EVALUATING, .pill.PERMIT_ISSUED { background: rgba(245,185,66,0.15); color: var(--amber); }
+  .pill.ROLLED_BACK { background: rgba(79,140,255,0.15); color: var(--accent); }
+  button { background: var(--accent); color: white; border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; margin-right: 6px; }
+  button.deny { background: var(--red); }
+  button:hover { opacity: 0.85; }
+  pre { background: #0d1220; border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 11.5px; overflow: auto; max-height: 480px; }
+  .muted { color: var(--muted); font-size: 12px; }
+  .row { display:flex; gap: 8px; align-items:center; margin-bottom: 10px; flex-wrap: wrap; }
+  input, select { background: var(--panel-2); border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 6px 8px; font-size: 12px; }
+  .refresh { font-size: 11px; color: var(--muted); cursor: pointer; }
+  code { color: var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>MetricTrust Control Plane</h1>
+    <div class="subtitle">Evidence-bound execution control for autonomous product-analytics agents</div>
+  </div>
+  <div class="badge" id="health">checking API…</div>
+</header>
+
+<main>
+  <section class="card">
+    <h2>Action Queue <span class="refresh" onclick="refreshAll()">↻ refresh</span></h2>
+    <table id="actionsTable">
+      <thead><tr><th>Action</th><th>Agent</th><th>Resource</th><th>Status</th><th>Proposed</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>Pending Approvals</h2>
+    <table id="approvalsTable">
+      <thead><tr><th>Approval</th><th>Action</th><th>Expires</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section class="card full">
+    <h2>Propose a Test Action</h2>
+    <div class="row">
+      <span class="muted">agent</span>
+      <select id="pAgent"><option value="product-analytics-agent-01">product-analytics-agent-01</option></select>
+      <span class="muted">resource</span>
+      <input id="pResource" value="experiment/onboarding-v4" />
+      <span class="muted">current %</span>
+      <input id="pCurrent" type="number" value="20" style="width:70px" />
+      <span class="muted">requested %</span>
+      <input id="pRequested" type="number" value="20" style="width:70px" />
+      <span class="muted">metric</span>
+      <select id="pMetric">
+        <option value="seven_day_activation_rate">seven_day_activation_rate (approved)</option>
+        <option value="experimental_unvetted_metric">experimental_unvetted_metric (unapproved)</option>
+      </select>
+      <button onclick="proposeAction()">Propose</button>
+    </div>
+    <div class="muted" id="proposeResult"></div>
+  </section>
+
+  <section class="card">
+    <h2>Decision Evidence / Audit Trail</h2>
+    <div class="muted" id="selectedHint">Click a row in the Action Queue to inspect its full decision trail.</div>
+    <pre id="auditView">—</pre>
+  </section>
+
+  <section class="card">
+    <h2>Agent Registry &amp; Feature-Flag Store</h2>
+    <div class="muted">Agents (bounded authority)</div>
+    <pre id="agentsView">—</pre>
+    <div class="muted">Live feature-flag store (protected executor state)</div>
+    <pre id="flagsView">—</pre>
+  </section>
+</main>
+
+<script>
+const API = window.location.origin;
+
+async function j(url, opts) {
+  const r = await fetch(API + url, opts);
+  return { ok: r.ok, status: r.status, body: await r.json() };
+}
+
+async function refreshHealth() {
+  const el = document.getElementById('health');
+  try {
+    const r = await j('/health');
+    el.textContent = r.ok ? 'API online' : 'API error';
+  } catch (e) { el.textContent = 'API unreachable'; }
+}
+
+async function refreshActions() {
+  const r = await j('/actions');
+  const tbody = document.querySelector('#actionsTable tbody');
+  tbody.innerHTML = '';
+  for (const a of r.body) {
+    const tr = document.createElement('tr');
+    tr.onclick = () => showAudit(a.action_id);
+    tr.innerHTML = `<td><code>${a.action_id}</code></td><td>${a.agent_id}</td><td>${a.resource}</td>
+      <td><span class="pill ${a.status}">${a.status}</span></td><td>${new Date(a.created_at).toLocaleTimeString()}</td>`;
+    tbody.appendChild(tr);
+  }
+}
+
+async function refreshApprovals() {
+  const r = await j('/approvals');
+  const tbody = document.querySelector('#approvalsTable tbody');
+  tbody.innerHTML = '';
+  for (const ap of r.body) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><code>${ap.approval_id}</code></td><td><code>${ap.action_id}</code></td>
+      <td>${new Date(ap.expires_at).toLocaleTimeString()}</td>
+      <td><button onclick="decide('${ap.approval_id}', '${ap.action_id}', true)">Approve</button>
+          <button class="deny" onclick="decide('${ap.approval_id}', '${ap.action_id}', false)">Deny</button></td>`;
+    tbody.appendChild(tr);
+  }
+}
+
+async function decide(approvalId, actionId, approve) {
+  const r = await j(`/approvals/${approvalId}/decide?approve=${approve}`, {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({approver_identity: 'console-user@example.com', approver_role: 'product_owner'})
+  });
+  let execBody = null;
+  if (r.ok && r.body.permit_token) {
+    const execR = await j(`/execute/${actionId}`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({permit_token: r.body.permit_token}),
+    });
+    execBody = execR.body;
+  }
+  alert('Approval decision:\n' + JSON.stringify(r.body, null, 2) +
+        (execBody ? '\n\nExecutor result:\n' + JSON.stringify(execBody, null, 2) : ''));
+  refreshAll();
+}
+
+async function proposeAction() {
+  const payload = {
+    agent_id: document.getElementById('pAgent').value,
+    api_key: 'demo-key-product-analytics-01',
+    action_type: 'update_experiment_rollout',
+    resource: document.getElementById('pResource').value,
+    parameters: {
+      current_percentage: Number(document.getElementById('pCurrent').value),
+      requested_percentage: Number(document.getElementById('pRequested').value),
+    },
+    metric_id: document.getElementById('pMetric').value,
+    reason: 'proposed from console',
+  };
+  const r = await j('/actions/propose', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+  document.getElementById('proposeResult').textContent = JSON.stringify(r.body);
+  refreshAll();
+}
+
+async function showAudit(actionId) {
+  const r = await j(`/actions/${actionId}`);
+  document.getElementById('auditView').textContent = JSON.stringify(r.body, null, 2);
+  document.getElementById('selectedHint').textContent = `Showing decision trail for ${actionId}`;
+}
+
+async function refreshRegistry() {
+  const agents = await j('/agents');
+  document.getElementById('agentsView').textContent = JSON.stringify(agents.body, null, 2);
+  const flags = await j('/flags');
+  document.getElementById('flagsView').textContent = JSON.stringify(flags.body, null, 2);
+}
+
+function refreshAll() {
+  refreshHealth();
+  refreshActions();
+  refreshApprovals();
+  refreshRegistry();
+}
+
+refreshAll();
+setInterval(refreshAll, 5000);
+</script>
+</body>
+</html>

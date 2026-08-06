@@ -1,0 +1,21 @@
+user_id,experiment_id,variant,activated_within_7d,event_ts
+u1,onboarding-v4,control,1,2026-07-28 10:00:00
+u2,onboarding-v4,control,0,2026-07-28 10:01:00
+u3,onboarding-v4,control,1,2026-07-28 10:02:00
+u4,onboarding-v4,control,0,2026-07-28 10:03:00
+u5,onboarding-v4,control,1,2026-07-28 10:04:00
+u6,onboarding-v4,control,0,2026-07-28 10:05:00
+u7,onboarding-v4,control,1,2026-07-28 10:06:00
+u8,onboarding-v4,control,0,2026-07-28 10:07:00
+u9,onboarding-v4,control,1,2026-07-28 10:08:00
+u10,onboarding-v4,control,0,2026-07-28 10:09:00
+u11,onboarding-v4,treatment,1,2026-07-28 10:10:00
+u12,onboarding-v4,treatment,1,2026-07-28 10:11:00
+u13,onboarding-v4,treatment,0,2026-07-28 10:12:00
+u14,onboarding-v4,treatment,1,2026-07-28 10:13:00
+u15,onboarding-v4,treatment,1,2026-07-28 10:14:00
+u16,onboarding-v4,treatment,1,2026-07-28 10:15:00
+u17,onboarding-v4,treatment,0,2026-07-28 10:16:00
+u18,onboarding-v4,treatment,1,2026-07-28 10:17:00
+u19,onboarding-v4,treatment,1,2026-07-28 10:18:00
+u20,onboarding-v4,treatment,1,2026-07-28 10:19:00

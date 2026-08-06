@@ -1,0 +1,8 @@
+id: critical_tests_passing
+effect: forbid
+description: Deny if any critical dbt test failed on the upstream data.
+action: "*"
+conditions:
+  - path: evidence.critical_tests_failed
+    op: gt
+    value: 0

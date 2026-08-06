@@ -1,0 +1,10 @@
+id: approval_ceiling
+effect: forbid
+description: >
+  Hard ceiling — even with human approval, no agent may push a rollout
+  change above its configured approval_max_percentage.
+action: update_experiment_rollout
+conditions:
+  - path: parameters.requested_percentage
+    op: gt
+    value_ref: agent_authority.approval_max_percentage

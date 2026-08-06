@@ -1,0 +1,8 @@
+id: unapproved_metric
+effect: forbid
+description: Deny if the metric backing the action is not in APPROVED state in the metric registry.
+action: "*"
+conditions:
+  - path: evidence.metric_approval_status
+    op: ne
+    value: APPROVED

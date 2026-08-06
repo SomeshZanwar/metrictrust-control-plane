@@ -1,0 +1,15 @@
+# Minimal metric registry standing in for a full semantic layer (see
+# ROADMAP.md for the dbt Semantic Layer / MetricFlow upgrade path).
+# Each entry is the "approved definition" MetricTrust checks an action's
+# evidence against.
+metrics:
+  seven_day_activation_rate:
+    owner: "product-analytics"
+    approval_status: APPROVED
+    definition: "activated_within_7d users / assigned users, per experiment variant"
+    source_model: fct_experiment_outcomes
+  experimental_unvetted_metric:
+    owner: "unknown"
+    approval_status: UNAPPROVED
+    definition: "not yet reviewed"
+    source_model: null

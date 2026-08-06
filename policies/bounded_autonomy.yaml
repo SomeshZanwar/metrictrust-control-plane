@@ -1,0 +1,11 @@
+id: bounded_autonomy
+effect: permit
+description: >
+  Autonomous authority — the agent may execute without human approval if
+  the requested change is within its autonomous_max_percentage AND all
+  forbid rules above already passed.
+action: update_experiment_rollout
+conditions:
+  - path: parameters.requested_percentage
+    op: lte
+    value_ref: agent_authority.autonomous_max_percentage

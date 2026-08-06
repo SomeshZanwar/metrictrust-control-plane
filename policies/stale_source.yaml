@@ -1,0 +1,12 @@
+id: stale_source
+effect: forbid
+description: >
+  Deny if the evidence backing the action is older than the configured
+  freshness window. Mirrors the "stale-source" Cedar policy in the
+  original design doc, expressed in MetricTrust's own declarative rule
+  format instead of taking a hard Cedar dependency for the MVP.
+action: "*"
+conditions:
+  - path: evidence.source_freshness_minutes
+    op: gt
+    value: 60

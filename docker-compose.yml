@@ -1,0 +1,18 @@
+# Optional: run against PostgreSQL instead of the default local SQLite.
+# `docker compose up` then `docker compose exec app bash scripts/run_dbt.sh`
+# before hitting the API, exactly as in local development.
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: metrictrust
+      POSTGRES_PASSWORD: metrictrust
+      POSTGRES_DB: metrictrust
+    ports: ["5432:5432"]
+  app:
+    build: .
+    environment:
+      DATABASE_URL: postgresql+psycopg2://metrictrust:metrictrust@postgres:5432/metrictrust
+    depends_on: [postgres]
+    ports: ["8000:8000"]

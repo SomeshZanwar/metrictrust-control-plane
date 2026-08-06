@@ -1,0 +1,8 @@
+id: guardrail_state
+effect: forbid
+description: Deny if live guardrail metrics (error rate, support contacts, payment failures) are not within limits.
+action: "*"
+conditions:
+  - path: evidence.guardrail_state
+    op: ne
+    value: PASS

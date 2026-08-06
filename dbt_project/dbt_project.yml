@@ -1,0 +1,14 @@
+name: 'metrictrust_evidence'
+version: '1.0.0'
+config-version: 2
+profile: 'metrictrust_evidence'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  metrictrust_evidence:
+    +materialized: table
